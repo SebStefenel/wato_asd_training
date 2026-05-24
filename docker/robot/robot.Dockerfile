@@ -13,6 +13,9 @@ COPY src/robot/planner planner
 COPY src/robot/control control
 COPY src/robot/bringup_robot bringup_robot
 
+# OVERWRITE GPG KEY HERE (For the Source stage)
+RUN wget -qO /usr/share/keyrings/ros2-latest-archive-keyring.gpg https://raw.githubusercontent.com/ros/rosdistro/master/ros.key
+
 # Scan for rosdeps
 RUN apt-get -qq update && rosdep update && \
     rosdep install --from-paths . --ignore-src -r -s \
@@ -22,6 +25,10 @@ RUN apt-get -qq update && rosdep update && \
 
 ################################# Dependencies ################################
 FROM ${BASE_IMAGE} AS dependencies
+
+# OVERWRITE GPG KEY HERE (For the Dependencies stage)
+RUN wget -qO /usr/share/keyrings/ros2-latest-archive-keyring.gpg https://raw.githubusercontent.com/ros/rosdistro/master/ros.key
+RUN apt-get update
 
 # ADD MORE DEPENDENCIES HERE
 

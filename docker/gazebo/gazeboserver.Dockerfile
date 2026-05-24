@@ -8,6 +8,9 @@ WORKDIR ${AMENT_WS}/src
 # Copy in source code 
 COPY src/gazebo gazebo
 
+# OVERWRITE GPG KEY HERE (For the Source stage)
+RUN wget -qO /usr/share/keyrings/ros2-latest-archive-keyring.gpg https://raw.githubusercontent.com/ros/rosdistro/master/ros.key
+
 # Scan for rosdeps
 RUN apt-get -qq update && rosdep update && \
     rosdep install --from-paths . --ignore-src -r -s \
@@ -18,12 +21,15 @@ RUN apt-get -qq update && rosdep update && \
 ################################# Dependencies ################################
 FROM ${BASE_IMAGE} AS dependencies
 
-# RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
 
 RUN apt install -y lsb-release wget gnupg
 RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+
+# OVERWRITE GPG KEY HERE (For the Dependencies stage)
+RUN wget -qO /usr/share/keyrings/ros2-latest-archive-keyring.gpg https://raw.githubusercontent.com/ros/rosdistro/master/ros.key
+
 RUN apt-get -y update
 RUN apt-get -y install ros-${ROS_DISTRO}-ros-gz ignition-fortress
 RUN echo $GAZEBO_PLUGIN_PATH=/opt/ros/humble/lib

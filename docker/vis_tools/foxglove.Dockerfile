@@ -18,8 +18,11 @@ RUN apt-get -qq update && rosdep update && \
 ################################# Dependencies ################################
 FROM ${BASE_IMAGE} AS dependencies
 
+# Overwrite the expired GPG key directly where the base image expects it
+RUN wget -qO /usr/share/keyrings/ros2-latest-archive-keyring.gpg https://raw.githubusercontent.com/ros/rosdistro/master/ros.key
+
 # Install Foxglove Deps
-RUN apt-get update && apt-get install -y curl ros-humble-ros2bag ros-humble-rosbag2* ros-humble-foxglove-msgs&& \
+RUN apt-get update && apt-get install -y curl ros-humble-ros2bag ros-humble-rosbag2* ros-humble-foxglove-msgs && \
     rm -rf /var/lib/apt/lists/*
 
 # Set up apt repo
