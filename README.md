@@ -49,7 +49,7 @@ The system decomposes autonomous navigation into four decoupled ROS 2 nodes comm
 * **Polar-to-Cartesian Projection:** Converts raw 2D `sensor_msgs/msg/LaserScan` range and bearing arrays into Cartesian $(x, y)$ coordinates in the robot frame.
 * **Discretization & Grid Mapping:** Discretizes local space into a 2D occupancy grid ($0.1\text{ m/cell}$) centered around the vehicle base.
 * **Obstacle Inflation:** Applies Euclidean distance-based inflation around detected obstacle points using a linear decay model:
-  $$\text{cost} = \text{max\_cost} \cdot \left(1 - \frac{d}{r_{\text{inflation}}}\right)$$
+  `cost = max_cost * (1 - d / r_inflation)`
   This provides a continuous potential field buffer to keep path planning clear of robot footprint collisions.
 
 ### 2. Map Memory Node (`src/robot/map_memory`)
@@ -79,61 +79,6 @@ The system decomposes autonomous navigation into four decoupled ROS 2 nodes comm
 * **Simulation & Visualization:** Gazebo, Foxglove Studio
 * **Containerization:** Docker Engine & Docker Compose
 * **Build System:** CMake, `ament_cmake`, Colcon
-
----
-
-## Quick Start
-
-The repository uses a modular Docker container orchestration wrapper (`watod`) to streamline building, running, and debugging without local toolchain dependencies.
-
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/SebStefenel/wato_asd_training.git](https://github.com/SebStefenel/wato_asd_training.git)
-cd wato_asd_training
-```
-
-### 2. Configure Modules
-Ensure `watod-config.sh` specifies the target simulation, robotics stack, and visualizer modules:
-```bash
-ACTIVE_MODULES="robot gazebo vis_tools"
-```
-
-### 3. Build Container Images
-```bash
-./watod build
-```
-
-### 4. Launch Simulation Stack
-```bash
-./watod up
-```
-
-### 5. Visualize in Foxglove Studio
-1. Open [Foxglove Studio](https://foxglove.dev/) (desktop app or web client).
-2. Connect to the WebSocket bridge URL displayed in your container startup logs (typically `ws://localhost:8765`).
-3. Import the pre-configured layout from:
-   ```text
-   config/wato_asd_training_foxglove_config.json
-   ```
-4. Set a navigation target using the 2D Goal tool or publish directly to `/goal_point` to trigger autonomous path generation and tracking.
-
----
-
-## Development & Incremental Compilation
-
-When modifying a single node (e.g., within `src/robot/costmap` or `src/robot/planner`):
-
-```bash
-# Rebuild and restart only the robot service container
-./watod down robot
-./watod build robot
-./watod up robot
-```
-
-To configure VS Code IntelliSense within the containerized development environment:
-```bash
-./watod --setup-dev-env robot
-```
 
 ---
 
